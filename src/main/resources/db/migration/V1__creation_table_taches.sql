@@ -1,0 +1,5 @@
+CREATE TABLE taches (
+    id BIGSERIAL PRIMARY KEY,
+    titre VARCHAR(255) NOT NULL,
+    terminee BOOLEAN NOT NULL DEFAULT false
+);
