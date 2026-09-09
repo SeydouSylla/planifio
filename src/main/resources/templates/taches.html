@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifio — Mes tâches</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+  <nav class="barre-navigation">
+    <a th:href="@{/}">🏠 Accueil</a>
+    <a th:href="@{/taches}" class="lien-actif">📋 Tâches</a>
+    <a th:href="@{/agenda}">📅 Agenda</a>
+    <a th:href="@{/statistiques}">📊 Mes statistiques</a>
+    <form th:action="@{/deconnexion}" method="post" class="form-deconnexion">
+      <button type="submit">Déconnexion</button>
+    </form>
+  </nav>
+
+  <main class="conteneur-tableau">
+    <h1>📋 Mes tâches</h1>
+
+    <form th:action="@{/taches}" method="post" th:object="${tacheFormulaire}" class="formulaire-tache">
+      <div class="champ-formulaire">
+        <input type="text" th:field="*{titre}" placeholder="Nouvelle tâche...">
+        <span th:if="${#fields.hasErrors('titre')}" th:errors="*{titre}" class="message-erreur"></span>
+      </div>
+      <input type="datetime-local" th:field="*{dateEcheance}" title="Échéance (optionnelle)">
+      <select th:field="*{priorite}">
+        <option value="">Priorité...</option>
+        <option th:each="p : ${priorites}" th:value="${p}" th:text="${p}"></option>
+      </select>
+      <div class="champ-formulaire">
+        <input type="text" th:field="*{categorie}" placeholder="Catégorie (optionnel)">
+        <span th:if="${#fields.hasErrors('categorie')}" th:errors="*{categorie}" class="message-erreur"></span>
+      </div>
+      <button type="submit">Ajouter</button>
+    </form>
+
+    <table class="tableau-taches" th:if="${!#lists.isEmpty(taches)}">
+      <thead>
+        <tr>
+          <th>Statut</th>
+          <th>Titre</th>
+          <th>Échéance</th>
+          <th>Priorité</th>
+          <th>Catégorie</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="tache : ${taches}" th:classappend="${tache.terminee} ? 'ligne-terminee'">
+          <td>
+            <form th:if="${!tache.terminee}" th:action="@{/taches/{id}/terminer(id=${tache.id})}" method="post">
+              <button type="submit" class="bouton-icone bouton-valider" title="Marquer comme terminée">✓</button>
+            </form>
+            <span th:if="${tache.terminee}" class="puce-terminee">✓ Terminée</span>
+          </td>
+          <td th:text="${tache.titre}"></td>
+          <td th:text="${tache.dateEcheance != null ? tache.dateEcheance : '—'}"></td>
+          <td>
+            <span th:if="${tache.priorite != null}"
+                  th:class="'etiquette-priorite priorite-' + ${tache.priorite}"
+                  th:text="${tache.priorite}"></span>
+          </td>
+          <td th:text="${tache.categorie != null ? tache.categorie : '—'}"></td>
+          <td class="cellule-actions">
+            <a th:href="@{/taches/{id}/modifier(id=${tache.id})}" class="bouton-icone bouton-modifier" title="Modifier">✎</a>
+            <form th:action="@{/taches/{id}/supprimer(id=${tache.id})}" method="post"
+                  onsubmit="return confirm('Supprimer définitivement cette tâche ?');">
+              <button type="submit" class="bouton-icone bouton-supprimer" title="Supprimer">✕</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p th:if="${#lists.isEmpty(taches)}" class="vide">Aucune tâche pour l'instant.</p>
+  </main>
+</body>
+</html>
