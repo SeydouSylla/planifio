@@ -45,6 +45,7 @@ public class UtilisateurDetails implements UserDetails {
     @Override
     public boolean isAccountNonExpired() { return true; }
 
+    //Pour la détection de connexions sucpectes
     @Override
     public boolean isAccountNonLocked() {
         return utilisateur.getTentativesEchoueesConsecutives() < ConnexionSecuriteService.SEUIL_VERROUILLAGE;

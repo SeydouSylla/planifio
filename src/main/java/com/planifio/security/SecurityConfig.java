@@ -30,6 +30,12 @@ public class SecurityConfig {
                 .loginPage("/connexion")           // notre propre page, pas celle générée par défaut
                 .loginProcessingUrl("/connexion")   // URL que le formulaire soumet en POST
                 .defaultSuccessUrl("/taches", true)
+                // Même message générique pour "mauvais mot de passe" ET "compte
+                // verrouillé" (voir UtilisateurDetails.isAccountNonLocked) - un
+                // choix de sécurité délibéré : révéler qu'un compte est
+                // verrouillé confirmerait à un attaquant que cet email existe
+                // et qu'il a atteint le seuil, une information qu'il n'a pas
+                // besoin d'obtenir.
                 .failureUrl("/connexion?erreur")
                 .permitAll()
             )
