@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifio — Accueil</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+  <nav class="barre-navigation">
+    <a th:href="@{/}" class="lien-actif">🏠 Accueil</a>
+    <a th:href="@{/taches}">📋 Tâches</a>
+    <a th:href="@{/agenda}">📅 Agenda</a>
+    <a th:href="@{/statistiques}">📊 Mes statistiques</a>
+    <form th:action="@{/deconnexion}" method="post" class="form-deconnexion">
+      <button type="submit">Déconnexion</button>
+    </form>
+  </nav>
+
+  <main class="conteneur-large">
+    <h1>Bonjour, <span th:text="${nomUtilisateur}"></span> 👋</h1>
+
+    <div class="grille-accueil">
+      <section class="bloc-accueil">
+        <h2>📋 Tâches du jour</h2>
+        <ul class="liste-simple">
+          <li th:each="tache : ${tachesDuJour}">
+            <span th:text="${tache.titre}"></span>
+            <span th:if="${tache.priorite != null}"
+                  th:class="'etiquette-priorite priorite-' + ${tache.priorite}"
+                  th:text="${tache.priorite}"></span>
+          </li>
+          <li th:if="${#lists.isEmpty(tachesDuJour)}" class="vide">Rien de prévu aujourd'hui — bien joué, ou repose-toi !</li>
+        </ul>
+        <a th:href="@{/taches}" class="lien-voir-tout">Voir toutes mes tâches →</a>
+      </section>
+
+      <section class="bloc-accueil">
+        <h2>📅 Prochains événements</h2>
+        <ul class="liste-simple">
+          <li th:each="evenement : ${evenementsAVenir}">
+            <span th:text="${evenement.titre}"></span>
+            <span class="date-evenement" th:text="${evenement.dateDebut}"></span>
+          </li>
+          <li th:if="${#lists.isEmpty(evenementsAVenir)}" class="vide">Aucun événement dans les 7 prochains jours.</li>
+        </ul>
+        <a th:href="@{/agenda}" class="lien-voir-tout">Voir mon agenda →</a>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

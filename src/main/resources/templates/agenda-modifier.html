@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifio — Modifier l'événement</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+  <nav class="barre-navigation">
+    <a th:href="@{/}">🏠 Accueil</a>
+    <a th:href="@{/taches}">📋 Tâches</a>
+    <a th:href="@{/agenda}" class="lien-actif">📅 Agenda</a>
+    <a th:href="@{/statistiques}">📊 Mes statistiques</a>
+    <form th:action="@{/deconnexion}" method="post" class="form-deconnexion">
+      <button type="submit">Déconnexion</button>
+    </form>
+  </nav>
+
+  <main class="conteneur">
+    <h1>✎ Modifier l'événement</h1>
+
+    <form th:action="@{/agenda/{id}/modifier(id=${evenementId})}" method="post" th:object="${evenementFormulaire}" class="formulaire-vertical">
+      <input type="hidden" name="mois" th:value="${mois}">
+      <label>Titre
+        <input type="text" th:field="*{titre}">
+        <span th:if="${#fields.hasErrors('titre')}" th:errors="*{titre}" class="message-erreur"></span>
+      </label>
+      <label>Description
+        <input type="text" th:field="*{description}">
+      </label>
+      <label>Début
+        <input type="datetime-local" th:field="*{dateDebut}">
+        <span th:if="${#fields.hasErrors('dateDebut')}" th:errors="*{dateDebut}" class="message-erreur"></span>
+      </label>
+      <label>Fin
+        <input type="datetime-local" th:field="*{dateFin}">
+        <span th:if="${#fields.hasErrors('dateFin')}" th:errors="*{dateFin}" class="message-erreur"></span>
+      </label>
+      <div class="actions-formulaire">
+        <button type="submit">Enregistrer</button>
+        <a th:href="@{/agenda(mois=${mois})}" class="bouton-annuler">Annuler</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
