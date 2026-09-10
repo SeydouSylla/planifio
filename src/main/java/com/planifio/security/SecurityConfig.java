@@ -21,8 +21,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                // Routes publiques : accessibles sans être connecté
-                .requestMatchers("/connexion", "/inscription", "/css/**", "/actuator/health").permitAll()
+                // Routes publiques : accessibles sans être connecté.
+                // "/style.css" en toutes lettres, pas "/css/**" — le fichier
+                // est servi à la racine (src/main/resources/static/style.css),
+                // jamais sous un sous-dossier /css/.
+                .requestMatchers("/connexion", "/inscription", "/style.css", "/actuator/health").permitAll()
                 // Toutes les autres routes exigent une session authentifiée
                 .anyRequest().authenticated()
             )
