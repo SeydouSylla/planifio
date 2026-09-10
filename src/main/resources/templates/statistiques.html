@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifio — Mes statistiques</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+  <nav class="barre-navigation">
+    <a th:href="@{/}">🏠 Accueil</a>
+    <a th:href="@{/taches}">📋 Tâches</a>
+    <a th:href="@{/agenda}">📅 Agenda</a>
+    <a th:href="@{/statistiques}" class="lien-actif">📊 Mes statistiques</a>
+    <form th:action="@{/deconnexion}" method="post" class="form-deconnexion">
+      <button type="submit">Déconnexion</button>
+    </form>
+  </nav>
+
+  <main class="conteneur">
+    <h1>📊 Mes statistiques</h1>
+
+    <div class="grille-stats">
+      <div class="carte-stat">
+        <span class="valeur-stat" th:text="${stats.tachesTermineesSemaine} + ' / ' + ${stats.tachesTotalSemaine}"></span>
+        <span class="libelle-stat">tâches prévues cette semaine, terminées</span>
+      </div>
+
+      <div class="carte-stat" th:classappend="${stats.tachesEnRetard > 0} ? 'carte-alerte'">
+        <span class="valeur-stat" th:text="${stats.tachesEnRetard}"></span>
+        <span class="libelle-stat">tâche(s) en retard</span>
+      </div>
+
+      <div class="carte-stat">
+        <span class="valeur-stat" th:text="${#numbers.formatDecimal(stats.tauxCompletionGlobal * 100, 1, 0)} + '%'"></span>
+        <span class="libelle-stat">taux de complétion global</span>
+      </div>
+
+      <div class="carte-stat">
+        <span class="valeur-stat" th:text="${stats.evenementsCeMois}"></span>
+        <span class="libelle-stat">événement(s) ce mois-ci</span>
+      </div>
+    </div>
+
+    <p th:if="${stats.tachesEnRetard == 0 and stats.tachesTotalSemaine == 0}" class="message-info">
+      Aucune tâche avec échéance pour l'instant — ajoute des dates limites à tes tâches pour voir apparaître tes statistiques ici.
+    </p>
+  </main>
+</body>
+</html>
