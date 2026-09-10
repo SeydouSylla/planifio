@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifio — Modifier la tâche</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+  <nav class="barre-navigation">
+    <a th:href="@{/}">🏠 Accueil</a>
+    <a th:href="@{/taches}" class="lien-actif">📋 Tâches</a>
+    <a th:href="@{/agenda}">📅 Agenda</a>
+    <a th:href="@{/statistiques}">📊 Mes statistiques</a>
+    <form th:action="@{/deconnexion}" method="post" class="form-deconnexion">
+      <button type="submit">Déconnexion</button>
+    </form>
+  </nav>
+
+  <main class="conteneur">
+    <h1>✎ Modifier la tâche</h1>
+
+    <form th:action="@{/taches/{id}/modifier(id=${tacheId})}" method="post" th:object="${tacheFormulaire}" class="formulaire-vertical">
+      <label>Titre
+        <input type="text" th:field="*{titre}">
+        <span th:if="${#fields.hasErrors('titre')}" th:errors="*{titre}" class="message-erreur"></span>
+      </label>
+      <label>Échéance
+        <input type="datetime-local" th:field="*{dateEcheance}">
+      </label>
+      <label>Priorité
+        <select th:field="*{priorite}">
+          <option value="">Aucune</option>
+          <option th:each="p : ${priorites}" th:value="${p}" th:text="${p}"></option>
+        </select>
+      </label>
+      <label>Catégorie
+        <input type="text" th:field="*{categorie}">
+        <span th:if="${#fields.hasErrors('categorie')}" th:errors="*{categorie}" class="message-erreur"></span>
+      </label>
+      <div class="actions-formulaire">
+        <button type="submit">Enregistrer</button>
+        <a th:href="@{/taches}" class="bouton-annuler">Annuler</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
