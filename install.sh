@@ -1,12 +1,13 @@
 #!/bin/bash
-# install.sh - Installation automatisée de Planifio
+# install.sh — Installation automatisée de Planifio
 
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
 
-echo "   INSTALLATION - PLANIFIO"
+echo "   INSTALLATION — PLANIFIO"
+
 
 echo "[1/3] Vérification de Docker..."
 if ! command -v docker &> /dev/null || ! docker compose version &> /dev/null; then
@@ -19,12 +20,14 @@ echo "  Ok: Docker opérationnel"
 echo ""
 echo "[2/3] Configuration des secrets locaux..."
 if [ -f .env ]; then
-  echo "  Ok: Fichier .env déjà présent - conservé tel quel"
+  echo "  Ok: Fichier .env déjà présent — conservé tel quel"
 else
   cat > .env <<EOF
+DB_NAME=planifio
+DB_USER=planifio
 DB_PASSWORD=$(openssl rand -hex 16)
 EOF
-  echo "  Ok: Fichier .env généré avec des valeurs aléatoires sécurisées"
+  echo "  Ok: Fichier .env généré (identifiants fixes, mot de passe aléatoire sécurisé)"
 fi
 
 echo ""
