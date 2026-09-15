@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: planifio
-          image: ghcr.io/seydousylla/planifio:latest
+          image: ghcr.io/seydousylla/planifio:staging-latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
