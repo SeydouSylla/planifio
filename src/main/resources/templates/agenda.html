@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifio — Agenda</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+  <nav class="barre-navigation">
+    <a th:href="@{/}">🏠 Accueil</a>
+    <a th:href="@{/taches}">📋 Tâches</a>
+    <a th:href="@{/agenda}" class="lien-actif">📅 Agenda</a>
+    <a th:href="@{/statistiques}">📊 Mes statistiques</a>
+    <form th:action="@{/deconnexion}" method="post" class="form-deconnexion">
+      <button type="submit">Déconnexion</button>
+    </form>
+  </nav>
+
+  <main class="conteneur-large">
+    <div class="entete-calendrier">
+      <a th:href="@{/agenda(mois=${moisPrecedent})}">◀</a>
+      <h1 th:text="${moisAffiche}"></h1>
+      <a th:href="@{/agenda(mois=${moisSuivant})}">▶</a>
+    </div>
+
+    <table class="grille-calendrier">
+      <thead>
+        <tr>
+          <th>Lun</th><th>Mar</th><th>Mer</th><th>Jeu</th><th>Ven</th><th>Sam</th><th>Dim</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- th:each imbriqué : une ligne du tableau par semaine, une cellule par jour -->
+        <tr th:each="semaine : ${semaines}">
+          <td th:each="jour : ${semaine}"
+              th:classappend="${!jour.dansLeMoisCourant} ? 'jour-hors-mois' : (${jour.estAujourdHui} ? 'jour-aujourdhui' : '')">
+            <span class="numero-jour" th:text="${jour.date.dayOfMonth}"></span>
+
+            <div th:each="evenement : ${jour.evenements}" class="puce-evenement">
+              <a th:href="@{/agenda/{id}/modifier(id=${evenement.id}, mois=${moisAffiche})}"
+                 class="titre-evenement" th:text="${evenement.titre}"></a>
+              <form th:action="@{/agenda/{id}/supprimer(id=${evenement.id})}" method="post"
+                    onsubmit="return confirm('Supprimer cet événement ?');">
+                <input type="hidden" name="mois" th:value="${moisAffiche}">
+                <button type="submit" class="bouton-supprimer-mini" title="Supprimer">✕</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Ajouter un événement</h2>
+    <form th:action="@{/agenda}" method="post" th:object="${evenementFormulaire}" class="formulaire-evenement">
+      <label>Titre
+        <input type="text" th:field="*{titre}">
+        <span th:if="${#fields.hasErrors('titre')}" th:errors="*{titre}" class="message-erreur"></span>
+      </label>
+      <label>Description
+        <input type="text" th:field="*{description}">
+      </label>
+      <label>Début
+        <input type="datetime-local" th:field="*{dateDebut}">
+        <span th:if="${#fields.hasErrors('dateDebut')}" th:errors="*{dateDebut}" class="message-erreur"></span>
+      </label>
+      <label>Fin
+        <input type="datetime-local" th:field="*{dateFin}">
+        <span th:if="${#fields.hasErrors('dateFin')}" th:errors="*{dateFin}" class="message-erreur"></span>
+      </label>
+      <button type="submit">Ajouter</button>
+    </form>
+  </main>
+</body>
+</html>

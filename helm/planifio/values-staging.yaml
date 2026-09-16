@@ -1,0 +1,16 @@
+image:
+  tag: staging-latest
+
+domain: staging.planifio.ssylla.com
+
+app:
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "384Mi"
+      cpu: "300m"
+
+postgres:
+  storage: 1Gi

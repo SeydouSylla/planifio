@@ -1,0 +1,96 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+
+  # Première étape : vérifier que l'application fonctionne correctement.
+  # Cette partie est utilisée comme contrôle avant de construire l'image Docker.  
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: planifio
+          POSTGRES_USER: planifio
+          POSTGRES_PASSWORD: test_password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U planifio"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Exécuter les tests (avec une vraie base PostgreSQL de service)
+        env:
+          DB_HOST: localhost
+          DB_NAME: planifio
+          DB_USER: planifio
+          DB_PASSWORD: test_password
+        run: ./mvnw test -B
+
+  # Deuxième étape : construire l'image Docker et l'envoyer sur GHCR.
+  # Cette étape dépend du job "test".
+  # Si les tests échouent, l'image Docker ne sera pas construite.
+  build-and-push:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    # Le workflow peut lire le repository et écrire dans GitHub Packages.
+    # Le deuxième droit est nécessaire pour envoyer l'image Docker vers GHCR.
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # On récupère à nouveau le code pour pouvoir construire l'image Docker.
+      - uses: actions/checkout@v4
+
+      - name: Connexion au registre
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+    
+
+      # Le nom du tag dépend de la branche :
+      # main    -> production
+      # develop -> staging
+
+      # L'image est préparée pour les environnements staging et production.
+      # Le déploiement automatique avec Kubernetes sera ajouté ultérieurement.
+      - name: Déterminer l'environnement selon la branche
+        id: tag
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "env=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "env=staging" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Normaliser le nom du propriétaire en minuscules
+        id: owner
+        run: echo "name=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Build et push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ steps.owner.outputs.name }}/planifio:${{ steps.tag.outputs.env }}-${{ github.sha }}
+            ghcr.io/${{ steps.owner.outputs.name }}/planifio:${{ steps.tag.outputs.env }}-latest

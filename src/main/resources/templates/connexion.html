@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifio — Connexion</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+  <main class="conteneur-auth">
+    <h1>Planifio</h1>
+    <p th:if="${param.erreur}" class="message-erreur">Email ou mot de passe incorrect.</p>
+    <p th:if="${param.deconnecte}" class="message-info">Vous avez été déconnecté.</p>
+    <p th:if="${param.inscrit}" class="message-succes">Compte créé — vous pouvez vous connecter.</p>
+    <form th:action="@{/connexion}" method="post">
+      <label>Email
+        <input type="email" name="username" required autofocus>
+      </label>
+      <label>Mot de passe
+        <input type="password" name="password" required>
+      </label>
+      <button type="submit">Se connecter</button>
+    </form>
+    <p class="lien-secondaire">Pas encore de compte ? <a th:href="@{/inscription}">S'inscrire</a></p>
+  </main>
+</body>
+</html>

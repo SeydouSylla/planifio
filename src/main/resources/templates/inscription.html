@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifio — Inscription</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+  <main class="conteneur-auth">
+    <h1>Créer un compte</h1>
+
+    <p th:if="${erreurEmail}" th:text="${erreurEmail}" class="message-erreur"></p>
+
+    <form th:action="@{/inscription}" th:object="${inscriptionForm}" method="post">
+      <label>Nom
+        <input type="text" th:field="*{nom}" required>
+        <span th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}" class="message-erreur"></span>
+      </label>
+      <label>Email
+        <input type="email" th:field="*{email}" required>
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="message-erreur"></span>
+      </label>
+      <label>Mot de passe
+        <input type="password" th:field="*{motDePasse}" required minlength="8">
+        <span th:if="${#fields.hasErrors('motDePasse')}" th:errors="*{motDePasse}" class="message-erreur"></span>
+      </label>
+      <button type="submit">Créer mon compte</button>
+    </form>
+
+    <p class="lien-secondaire">Déjà un compte ? <a th:href="@{/connexion}">Se connecter</a></p>
+  </main>
+</body>
+</html>

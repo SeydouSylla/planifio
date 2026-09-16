@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: planifio
+  labels:
+    app: planifio
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector:
+    matchLabels:
+      app: planifio
+  template:
+    metadata:
+      labels:
+        app: planifio
+    spec:
+      containers:
+        - name: planifio
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: postgres
+            - name: DB_NAME
+              value: planifio
+            - name: DB_USER
+              value: planifio
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretName }}
+                  key: dbPassword
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            periodSeconds: 20

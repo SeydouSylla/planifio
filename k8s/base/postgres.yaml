@@ -1,0 +1,65 @@
+# k8s/base/postgres.yaml
+
+# PostgreSQL tourne DANS le cluster k3s (StatefulSet + volume persistant),
+# plutôt qu'un service managé externe
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: planifio
+            - name: POSTGRES_USER
+              value: planifio
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: planifio-secret
+                  key: dbPassword
+          volumeMounts:
+            - name: donnees-postgres
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "planifio"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: donnees-postgres
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+  # clusterIP: None -> Service headless, nécessaire pour qu'un StatefulSet
+  # obtienne une identité réseau stable (postgres-0.postgres, etc.),
+  # même si ici un seul réplica suffit.
+  clusterIP: None
