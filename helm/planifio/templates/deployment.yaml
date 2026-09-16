@@ -35,7 +35,7 @@ spec:
                   key: dbPassword
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
-                    startupProbe:
+          startupProbe:
             httpGet:
               path: /actuator/health
               port: 8080
