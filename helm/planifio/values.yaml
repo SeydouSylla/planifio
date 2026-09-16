@@ -1,0 +1,21 @@
+image:
+  repository: ghcr.io/seydousylla/planifio
+  tag: production-latest
+  pullPolicy: IfNotPresent
+
+domain: planifio.ssylla.com
+
+app:
+  replicas: 1
+  resources:
+    requests:
+      memory: "384Mi"
+      cpu: "150m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+postgres:
+  storage: 2Gi
+
+secretName: planifio-secret
